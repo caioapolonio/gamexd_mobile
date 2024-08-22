@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { Image, TextInput, TouchableOpacity, View } from "react-native";
+import { TextInput, TouchableOpacity, View } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
 import Feather from "@expo/vector-icons/Feather";
 
-const FormField = ({ placeholder, value, leftIcon }) => {
+const FormField = ({ placeholder, value, leftIcon, onChangeText, onBlur }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <View className="rounded-2xl bg-white relative w-full p-4">
+    <View className="rounded-2xl bg-white relative w-full p-4 mt-4 mb-1">
       <View className="relative">
         {leftIcon && (
           <View className="absolute left-2 top-1/2 transform -translate-y-1/2">
@@ -16,14 +16,15 @@ const FormField = ({ placeholder, value, leftIcon }) => {
         )}
 
         <TextInput
-          className={w-full h-10 px-10 ${
+          className={`w-full h-10 px-10 ${
             leftIcon ? "pl-12" : "pl-3"
-          } text-xl font-medium justify-center flex flex-col} // Adjust padding for left icon
+          } text-xl font-medium justify-center flex flex-col`}
           placeholder={placeholder}
           value={value}
-          //onChangeText={handleChangeText}
+          onBlur={onBlur}
+          onChangeText={onChangeText}
           placeholderTextColor={"#747688"}
-          secureTextEntry={placeholder === "Senha" && !showPassword}
+          secureTextEntry={leftIcon === "lock" && !showPassword}
         />
       </View>
 
