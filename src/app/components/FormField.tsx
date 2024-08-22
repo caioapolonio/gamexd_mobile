@@ -16,9 +16,9 @@ const FormField = ({ placeholder, value, leftIcon }) => {
         )}
 
         <TextInput
-          className={`w-full h-10 px-10 ${
+          className={w-full h-10 px-10 ${
             leftIcon ? "pl-12" : "pl-3"
-          } text-xl font-medium justify-center flex flex-col`} // Adjust padding for left icon
+          } text-xl font-medium justify-center flex flex-col} // Adjust padding for left icon
           placeholder={placeholder}
           value={value}
           //onChangeText={handleChangeText}
@@ -27,7 +27,7 @@ const FormField = ({ placeholder, value, leftIcon }) => {
         />
       </View>
 
-      {placeholder === "Senha" && (
+      {leftIcon === "lock" && (
         <TouchableOpacity
           onPress={() => setShowPassword(!showPassword)}
           style={{

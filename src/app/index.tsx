@@ -21,7 +21,7 @@ const Index = () => {
           <CustomButton
             title="Continuar"
             handlePress={() => router.push("/sign-in")}
-            containerStyles="w-full mt-7"
+            containerStyles="w-full mt-7 bg-white rounded-2xl"
           />
         </View>
       </ScrollView>
