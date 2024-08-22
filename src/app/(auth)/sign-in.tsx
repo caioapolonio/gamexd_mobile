@@ -16,7 +16,7 @@ const SignIn = () => {
             <Image source={require("../../../assets/images/gamexdlogo.png")} />
           </View>
           <View className="w-full flex gap-6">
-            <Text className="text-white font-bold text-3xl">Entrar</Text>
+            <Text className="text-white font-base text-3xl">Entrar</Text>
             <FormField placeholder="Email" leftIcon={"mail"} />
             <FormField placeholder="Senha" leftIcon={"lock"} />
             <View className="flex flex-row w-full justify-end">
