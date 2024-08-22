@@ -7,7 +7,7 @@ const FormField = ({ placeholder, value, leftIcon }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <View className="rounded-lg bg-white relative w-full p-4">
+    <View className="rounded-2xl bg-white relative w-full p-4">
       <View className="relative">
         {leftIcon && (
           <View className="absolute left-2 top-1/2 transform -translate-y-1/2">
