@@ -10,16 +10,16 @@ const CustomButton = ({
 }) => {
   return (
     <View
-      className={ relative min-h-16 justify-center items-center ${containerStyles} ${
+      className={`relative min-h-16 justify-center items-center ${containerStyles} ${
         isLoading ? "opacity-50" : ""
-      }}
+      }`}
     >
       <TouchableOpacity
         onPress={handlePress}
         activeOpacity={0.7}
         disabled={isLoading}
       >
-        <Text className={text-black font-semibold text-lg ${textStyles}}>
+        <Text className={`text-black font-semibold text-lg ${textStyles}`}>
           {title}
         </Text>
       </TouchableOpacity>
