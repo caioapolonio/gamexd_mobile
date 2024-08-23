@@ -1,9 +1,10 @@
 import React from "react";
 import { Link } from "expo-router";
-import { SafeAreaView, ScrollView, Text, View } from "react-native";
+import { SafeAreaView, ScrollView, Text, View, Alert } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import FormField from "../components/FormField";
 import CustomButton from "../components/CustomButton";
+import { supabase } from "../../db/supabase";
 
 const SignUp = () => {
   const {
@@ -13,8 +14,20 @@ const SignUp = () => {
     getValues,
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data); // Handle form submission, e.g., send data to an API
+  const onSubmit = async (data) => {
+    const { username, email, password } = data;
+
+    // Sign up the user with Supabase
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      Alert.alert("Sign Up Error", error.message);
+    } else {
+      Alert.alert("Success", "Your account has been created!");
+    }
   };
 
   return (
