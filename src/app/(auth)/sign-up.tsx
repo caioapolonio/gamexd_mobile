@@ -14,19 +14,67 @@ const SignUp = () => {
     getValues,
   } = useForm();
 
-  const onSubmit = async (data) => {
-    const { username, email, password } = data;
+  const onSubmit = async (e) => {
+    const { email, username, password } = e;
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("username", username);
+      if (error) {
+        console.error(
+          "Um erro ocorreu ao verificar o nome de usuário. ",
+          error
+        );
+        Alert.alert(
+          "Um erro ocorreu ao verificar a disponibilidade do nome de usuário."
+        );
+        return;
+      }
 
-    // Sign up the user with Supabase
-    const { error } = await supabase.auth.signUp({
+      if (data.length > 0) {
+        Alert.alert("Esse nome de usuário não está disponível, tente outro.");
+        return;
+      }
+    } catch (error) {
+      console.error("Um erro ocorreu ao verificar o nome de usuário.", error);
+      Alert.alert(
+        "Um erro ocorreu ao verificar a disponibilidade do nome de usuário."
+      );
+      return;
+    }
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: { username },
+      },
     });
 
     if (error) {
-      Alert.alert("Sign Up Error", error.message);
+      console.log(error);
+      Alert.alert(error.message);
     } else {
-      Alert.alert("Success", "Your account has been created!");
+      const { error } = await supabase
+        .from("profiles")
+        .update([
+          {
+            username: username,
+            avatar_url:
+              "https://i.pinimg.com/736x/ee/79/41/ee7941e54053f388bbc8f4fb043765b6.jpg",
+          },
+        ])
+        .eq("id", data?.user?.id);
+
+      if (error) {
+        Alert.alert("Erro ao criar perfil.", error.message);
+        return;
+      } else {
+        Alert.alert("Perfil criado com sucesso! " + data?.user?.email);
+      }
+
+      console.log("EVENT", e);
+      console.log("DATA", data);
     }
   };
 
@@ -44,19 +92,19 @@ const SignUp = () => {
             <Controller
               control={control}
               rules={{
-                required: "Username is required",
+                required: "Nome de usuário é obrigatório",
                 minLength: {
                   value: 4,
-                  message: "Username must be at least 4 characters",
+                  message: "Nome de usuário deve ter no mínimo 4 caracteres",
                 },
                 maxLength: {
                   value: 15,
-                  message: "Username cannot exceed 15 characters",
+                  message: "Nome de usuário deve ter no máximo 15 caracteres",
                 },
                 pattern: {
                   value: /^[a-zA-Z0-9_-]+$/,
                   message:
-                    "Username can only contain letters, numbers, underscores, and hyphens. No spaces allowed.",
+                    "Nome de usuário deve conter apenas letras, números, hífens e underscores",
                 },
               }}
               render={({ field: { onChange, onBlur, value } }) => (
@@ -77,10 +125,10 @@ const SignUp = () => {
             <Controller
               control={control}
               rules={{
-                required: "Email is required",
+                required: "Email é obrigatório",
                 pattern: {
                   value: /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+(\.[a-z]+)?$/i,
-                  message: "Enter a valid email address",
+                  message: "Use um e-mail válido",
                 },
               }}
               render={({ field: { onChange, onBlur, value } }) => (
@@ -101,10 +149,10 @@ const SignUp = () => {
             <Controller
               control={control}
               rules={{
-                required: "Password is required",
+                required: "Senha é obrigatória",
                 minLength: {
                   value: 6,
-                  message: "Password must be at least 6 characters",
+                  message: "Senha deve ter no mínimo 6 caracteres",
                 },
               }}
               render={({ field: { onChange, onBlur, value } }) => (
@@ -125,9 +173,9 @@ const SignUp = () => {
             <Controller
               control={control}
               rules={{
-                required: "Please confirm your password",
+                required: "Por favor confirme sua senha",
                 validate: (value) =>
-                  value === getValues("password") || "Passwords do not match",
+                  value === getValues("password") || "Senhas não coincidem",
               }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <FormField
@@ -147,7 +195,7 @@ const SignUp = () => {
             )}
 
             <CustomButton
-              title="Entrar"
+              title="Criar Conta"
               handlePress={handleSubmit(onSubmit)}
               containerStyles="w-full mt-4 bg-[#AB72CE] rounded-2xl "
               textStyles="text-white text-2xl uppercase font-normal"
