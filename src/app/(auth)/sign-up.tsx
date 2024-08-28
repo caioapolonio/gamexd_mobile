@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { SafeAreaView, ScrollView, Text, View, Alert } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import FormField from "../components/FormField";
@@ -71,6 +71,7 @@ const SignUp = () => {
         return;
       } else {
         Alert.alert("Perfil criado com sucesso! " + data?.user?.email);
+        router.push("/home");
       }
 
       console.log("EVENT", e);
