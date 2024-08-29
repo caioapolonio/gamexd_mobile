@@ -26,6 +26,17 @@ const AuthLayout = () => {
           },
         }}
       />
+      <Stack.Screen
+        name="forgot-password"
+        options={{
+          headerStyle: { backgroundColor: "#171524" },
+          title: "Esqueci a senha",
+          headerTintColor: "#fff",
+          headerTitleStyle: {
+            fontWeight: "bold",
+          },
+        }}
+      />
     </Stack>
   );
 };
