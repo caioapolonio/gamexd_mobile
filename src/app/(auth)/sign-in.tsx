@@ -1,9 +1,30 @@
-import { Link } from "expo-router";
-import { Image, SafeAreaView, ScrollView, Text, View } from "react-native";
+import { useState } from "react";
+import { Link, router } from "expo-router";
+import { Image, SafeAreaView, ScrollView, Text, View, Alert } from "react-native";
 import FormField from "../components/FormField";
 import CustomButton from "../components/CustomButton";
+import { supabase } from "../../db/supabase";
 
 const SignIn = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSignIn = async () => {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    setLoading(false);
+
+    if (error) {
+      Alert.alert("Erro", error.message);
+    } else {
+      router.push("/home");
+    }
+  };
+
   return (
     <SafeAreaView className="bg-[#171524] h-full flex-1">
       <ScrollView
@@ -17,16 +38,17 @@ const SignIn = () => {
           </View>
           <View className="w-full flex gap-6">
             <Text className="text-white font-base text-3xl">Entrar</Text>
-            <FormField placeholder="Email" leftIcon={"mail"} />
-            <FormField placeholder="Senha" leftIcon={"lock"} />
+            <FormField placeholder="Email" leftIcon={"mail"} onChangeText={setEmail} value={email} />
+            <FormField placeholder="Senha" leftIcon={"lock"} onChangeText={setPassword} value={password} />
             <View className="flex flex-row w-full justify-end">
               <Text className="text-white">Esqueceu a senha?</Text>
             </View>
             <CustomButton
-              title="Entrar"
-              handlePress={() => {}}
+              title={loading ? "Carregando..." : "Entrar"}
+              handlePress={handleSignIn}
               containerStyles="w-full mt-4 bg-[#AB72CE] rounded-2xl "
               textStyles="text-white text-2xl uppercase font-normal"
+              isLoading={loading}
             />
           </View>
 
