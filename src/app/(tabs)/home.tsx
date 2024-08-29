@@ -9,7 +9,7 @@ const Home = () => {
   const fetchRecentGames = async () => {
     try {
       const response = await fetch(
-        `http://10.50.31.113:3000/games/recent-games`
+        `http://localhost:3000/games/recent-games`
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
