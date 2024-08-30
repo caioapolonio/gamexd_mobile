@@ -41,7 +41,9 @@ const SignIn = () => {
             <FormField placeholder="Email" leftIcon={"mail"} onChangeText={setEmail} value={email} />
             <FormField placeholder="Senha" leftIcon={"lock"} onChangeText={setPassword} value={password} />
             <View className="flex flex-row w-full justify-end">
-              <Text className="text-white">Esqueceu a senha?</Text>
+              <Link href="/forgot-password" className="text-white">
+                Esqueceu a senha?
+              </Link>
             </View>
             <CustomButton
               title={loading ? "Carregando..." : "Entrar"}
