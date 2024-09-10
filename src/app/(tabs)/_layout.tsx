@@ -7,10 +7,16 @@ const TabsLayout = () => {
     <Tabs
       screenOptions={{
         tabBarShowLabel: false,
+        headerShown: false,
         tabBarStyle: {
           borderTopEndRadius: 12,
           borderTopStartRadius: 12,
           backgroundColor: "#373545",
+          height: 60,
+          position: "absolute",
+          bottom: 16,
+          right: 16,
+          left: 16,
         },
       }}
     >

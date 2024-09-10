@@ -8,7 +8,7 @@ const Home = () => {
 
   const fetchRecentGames = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/games/recent-games`);
+      const response = await fetch(`http://10.0.2.2:3000/games/recent-games`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -25,8 +25,8 @@ const Home = () => {
   }, []);
 
   return (
-    <SafeAreaView className="bg-[#171524] h-full">
-      <ScrollView className="h-full pt-16">
+    <SafeAreaView className="h-full">
+      <ScrollView className="bg-[#171524] h-full pt-16">
         <View className="pb-6 px-5">
           <Text className="text-white text-lg">Jogos Populares</Text>
           <View className="h-0.5 w-full bg-white"></View>
