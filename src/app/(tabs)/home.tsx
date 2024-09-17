@@ -13,7 +13,7 @@ const Home = () => {
         throw new Error("Network response was not ok");
       }
       const result = await response.json();
-      console.log("Games", result);
+      //console.log("Games", result);
       setRecentGames(result);
     } catch (error) {
       console.error("Erro ao recuperar dados:", error);
@@ -42,7 +42,7 @@ const Home = () => {
                 key={item.id}
                 title={item.name}
                 src={item.header_image}
-                card={true}
+                card={false}
               />
             ))}
           </View>
@@ -62,7 +62,7 @@ const Home = () => {
                 key={item.id}
                 title={item.name}
                 src={item.header_image}
-                card={true}
+                card={false}
               />
             ))}
           </View>

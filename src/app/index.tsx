@@ -4,9 +4,11 @@ import { View, Image, StyleSheet, Text, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native";
 import FormField from "./components/FormField";
 import CustomButton from "./components/CustomButton";
+import { AuthProvider } from "../hooks/AuthContext";
 
 const Index = () => {
   return (
+    //  <AuthProvider>
     <SafeAreaView className="bg-[#171524] h-full flex-1">
       <ScrollView
         contentContainerStyle={{
@@ -26,6 +28,7 @@ const Index = () => {
         </View>
       </ScrollView>
     </SafeAreaView>
+    // </AuthProvider>
   );
 };
 
