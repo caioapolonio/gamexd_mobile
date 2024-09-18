@@ -3,7 +3,14 @@ import { TextInput, TouchableOpacity, View } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
 import Feather from "@expo/vector-icons/Feather";
 
-const FormField = ({ placeholder, value, leftIcon, onChangeText, onBlur }) => {
+const FormField = ({
+  placeholder,
+  value,
+  leftIcon,
+  onChangeText,
+  onBlur,
+  rightIcon,
+}) => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -12,6 +19,12 @@ const FormField = ({ placeholder, value, leftIcon, onChangeText, onBlur }) => {
         {leftIcon && (
           <View className="absolute left-2 top-1/2 transform -translate-y-1/2">
             <Feather name={leftIcon} size={24} color="black" />
+          </View>
+        )}
+
+        {rightIcon && (
+          <View className="absolute right-2 top-1/2 transform -translate-y-1/2">
+            <Feather name={rightIcon} size={24} color="black" />
           </View>
         )}
 
