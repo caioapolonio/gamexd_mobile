@@ -7,11 +7,13 @@ import {
 } from "react-native";
 import GameCard from "../components/GameCard";
 import FormField from "../components/FormField";
+import { useRouter } from 'expo-router';
 
 const Search = () => {
   const [recentGames, setRecentGames] = useState([]);
   const [searchQuery, setSearchQuery] = useState(""); 
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const router = useRouter();
 
  
   useEffect(() => {
@@ -89,6 +91,7 @@ const Search = () => {
                   title={item.name}
                   src={item.header_image}
                   card={false}
+                  onPress={() => router.push(`../game/${item.id}`)}
                 />
               </View>
             )}

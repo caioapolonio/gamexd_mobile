@@ -5,13 +5,16 @@ import { useAuth } from "../../hooks/AuthContext";
 import { supabase } from "../../db/supabase";
 import GameCard from "../components/GameCard";
 import StarRating from "../components/StarRating";
+import CustomButton from "../components/CustomButton";
+import { useRouter } from 'expo-router';
 
 const Profile = () => {
-  const { session } = useAuth();
+  const { session, signOut } = useAuth();
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({});
   const [userFavorites, setUserFavorites] = useState([]);
   const [userReviews, setUserReviews] = useState([]);
+  const router = useRouter();
 
   const handleUser = async () => {
     setLoading(true);
@@ -67,7 +70,8 @@ const Profile = () => {
   return (
     <SafeAreaView className="h-full w-full">
       <ScrollView className="bg-[#171524] h-full pt-16">
-        <View className="pb-6 px-5 flex flex-row gap-6">
+        <View className="pb-6 px-5 flex flex-row gap-6 w-full justify-between">
+          <View className="flex flex-row gap-6">
           <Image
             className="w-20 h-20 rounded-full border-2 border-[#D8ABF4]"
             source={{ uri: user.avatar_url }}
@@ -80,6 +84,17 @@ const Profile = () => {
             <Text className="text-white text-base">
               {userReviews.length} Análises
             </Text>
+            
+          </View>
+          </View>
+          
+          <View>
+          <CustomButton
+           title={"Sair"}
+            containerStyles="rounded-2xl text-white border border-white w-20 h-12"
+            textStyles={"text-white"}
+            handlePress={signOut}
+           ></CustomButton>
           </View>
         </View>
         <View className="pb-6 px-5">
@@ -98,6 +113,7 @@ const Profile = () => {
                 title={item.Games.name}
                 src={item.Games.header_image}
                 card={false}
+                onPress={() => router.push(`../game/${item.id}`)}
               />
             ))}
           </View>
@@ -130,6 +146,7 @@ const Profile = () => {
                   title={item.Games.name}
                   src={item.Games.header_image}
                   card={true}
+                  onPress={() => router.push(`../game/${item.id}`)}
                 />
               </View>
             ))}

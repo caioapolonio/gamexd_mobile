@@ -1,10 +1,12 @@
 import React from "react";
-import { View, ScrollView, SafeAreaView, Text, Image } from "react-native";
+import { View, ScrollView, SafeAreaView, Text } from "react-native";
 import { useEffect, useState } from "react";
 import GameCard from "../components/GameCard";
+import { useRouter } from 'expo-router'; // Importar o hook de navegação
 
 const Home = () => {
   const [recentGames, setRecentGames] = useState([]);
+  const router = useRouter(); // Inicializar o router
 
   const fetchRecentGames = async () => {
     try {
@@ -13,7 +15,6 @@ const Home = () => {
         throw new Error("Network response was not ok");
       }
       const result = await response.json();
-      //console.log("Games", result);
       setRecentGames(result);
     } catch (error) {
       console.error("Erro ao recuperar dados:", error);
@@ -43,6 +44,7 @@ const Home = () => {
                 title={item.name}
                 src={item.header_image}
                 card={false}
+                onPress={() => router.push(`../game/${item.id}`)} // Navegar para a tela de detalhes
               />
             ))}
           </View>
@@ -63,6 +65,7 @@ const Home = () => {
                 title={item.name}
                 src={item.header_image}
                 card={false}
+                onPress={() => router.push(`../game/${item.id}`)} // Navegar para a tela de detalhes
               />
             ))}
           </View>
@@ -73,3 +76,4 @@ const Home = () => {
 };
 
 export default Home;
+
