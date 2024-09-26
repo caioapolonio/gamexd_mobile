@@ -1,6 +1,7 @@
 import { Session, User } from "@supabase/supabase-js";
 import { useContext, useState, useEffect, createContext } from "react";
 import { supabase } from "../db/supabase";
+import { router } from "expo-router"; // Importando o hook de navegação
 
 const AuthContext = createContext<{
   session: Session | null | undefined;
@@ -29,7 +30,6 @@ export const AuthProvider = ({ children }: any) => {
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
-        console.log("session authcontext", session);
         setUser(session?.user);
         setLoading(false);
       }
@@ -42,6 +42,17 @@ export const AuthProvider = ({ children }: any) => {
     };
   }, []);
 
+  // Redirecionar após carregar a sessão
+  useEffect(() => {
+    if (!loading) {
+      if (session) {
+        router.push('/home');
+      } else {
+        router.replace('/')
+      }
+    }
+  }, [loading, session]);
+
   const value = {
     session,
     setSession,
@@ -49,7 +60,6 @@ export const AuthProvider = ({ children }: any) => {
     signOut: () => supabase.auth.signOut(),
   };
 
-  // use a provider to pass down the value
   return (
     <AuthContext.Provider value={value}>
       {!loading && children}

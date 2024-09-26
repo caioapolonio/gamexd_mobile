@@ -21,7 +21,7 @@ const SignIn = () => {
     if (error) {
       Alert.alert("Erro", error.message);
     } else {
-      router.push("/home");
+      router.replace("/home");
     }
   };
 
