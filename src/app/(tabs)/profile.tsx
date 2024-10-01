@@ -6,7 +6,7 @@ import { supabase } from "../../db/supabase";
 import GameCard from "../components/GameCard";
 import StarRating from "../components/StarRating";
 import CustomButton from "../components/CustomButton";
-import { useRouter } from 'expo-router';
+import { useRouter } from "expo-router";
 
 const Profile = () => {
   const { session, signOut } = useAuth();
@@ -32,7 +32,7 @@ const Profile = () => {
   const handleFavorites = async () => {
     try {
       const response = await fetch(
-        `http://10.0.2.2:3000/favorites/${session.user.id}`
+      `http://10.0.2.2:3000/favorites/${session.user.id}`
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -72,29 +72,28 @@ const Profile = () => {
       <ScrollView className="bg-[#171524] h-full pt-16">
         <View className="pb-6 px-5 flex flex-row gap-6 w-full justify-between">
           <View className="flex flex-row gap-6">
-          <Image
-            className="w-20 h-20 rounded-full border-2 border-[#D8ABF4]"
-            source={{ uri: user.avatar_url }}
-          />
-          <View>
-            <Text className="text-white text-2xl">{user.username}</Text>
-            <Text className="text-white text-base">
-              {userFavorites.length} Jogos Favoritos
-            </Text>
-            <Text className="text-white text-base">
-              {userReviews.length} Análises
-            </Text>
-            
+            <Image
+              className="w-20 h-20 rounded-full border-2 border-[#D8ABF4]"
+              source={{ uri: user.avatar_url }}
+            />
+            <View>
+              <Text className="text-white text-2xl">{user.username}</Text>
+              <Text className="text-white text-base">
+                {userFavorites.length} Jogos Favoritos
+              </Text>
+              <Text className="text-white text-base">
+                {userReviews.length} Análises
+              </Text>
+            </View>
           </View>
-          </View>
-          
+
           <View>
-          <CustomButton
-           title={"Sair"}
-            containerStyles="rounded-2xl text-white border border-white w-20 h-12"
-            textStyles={"text-white"}
-            handlePress={signOut}
-           ></CustomButton>
+            <CustomButton
+              title={"Sair"}
+              containerStyles="rounded-2xl text-white border border-white w-20 h-12"
+              textStyles={"text-white"}
+              handlePress={signOut}
+            ></CustomButton>
           </View>
         </View>
         <View className="pb-6 px-5">
@@ -113,13 +112,13 @@ const Profile = () => {
                 title={item.Games.name}
                 src={item.Games.header_image}
                 card={false}
-                onPress={() => router.push(`../game/${item.id}`)}
+            onPress={() => router.push(`../game/${item.game_id}`)}
               />
             ))}
           </View>
         </ScrollView>
         <View className="pb-6 px-5">
-          <Text className="text-white text-lg">Adicionados Recentemente</Text>
+          <Text className="text-white text-lg">Análises</Text>
           <View className="h-0.5 w-full bg-white"></View>
         </View>
         <ScrollView className="h-64 w-full">
@@ -146,7 +145,7 @@ const Profile = () => {
                   title={item.Games.name}
                   src={item.Games.header_image}
                   card={true}
-                  onPress={() => router.push(`../game/${item.id}`)}
+                  onPress={() => router.push(`../game/${item.game_id}`)}
                 />
               </View>
             ))}
