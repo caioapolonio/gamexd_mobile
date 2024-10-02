@@ -17,7 +17,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const GameDetails = () => {
   const navigation = useNavigation();
-  const { id } = useLocalSearchParams(); // Pegando o id da URL
+  const { id } = useLocalSearchParams();
   const [gameDetails, setGameDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [reviews, setReviews] = useState([]);

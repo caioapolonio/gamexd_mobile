@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,10 +11,11 @@ import {
 import { useRoute } from "@react-navigation/native";
 import { IoSend } from "react-icons/io5";
 import CustomButton from "../components/CustomButton";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 
 const ForumInfo = () => {
   const route = useRoute();
+  const navigation = useNavigation();
   const { id } = useLocalSearchParams();
   //   const { session } = useAuth();
   const [forum, setForum] = useState([]);
@@ -60,71 +61,82 @@ const ForumInfo = () => {
     }
   };
 
-  //   const handleNewComment = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const response = await fetch("http:///10.0.2.2:3000/forums/new-comment", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           user_id: session.user.id,
-  //           forum_id: id,
-  //           comment: commentBody,
-  //         }),
-  //       });
-  //       if (!response.ok) throw new Error("Network response was not ok");
-  //       handleComments();
-  //       setCommentBody("");
-  //     } catch (error) {
-  //       console.error("Erro ao criar comentário:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "Fórum",
+      headerTintColor: "#FFFFFF",
+      headerStyle: {
+        backgroundColor: "#171524",
+      },
+    });
+  }, [navigation]);
 
   useEffect(() => {
     handleForum();
     handleComments();
   }, []);
 
+  if (loading) {
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#980d42"
+        className="h-full bg-[#171524]"
+      />
+    );
+  }
+
   return (
-    <View className="flex-1 ">
-      <ScrollView className="flex-1 p-6 bg-[#171524] ">
-        {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
-        ) : (
-          <View>
-            <View className="border-b pb-2">
-              <Text className="text-2xl font-medium text-white">
-                {forum.title}
-              </Text>
-            </View>
-            <View className="flex-row border rounded-md mt-3 ">
+    <View className="flex-1">
+      <ScrollView className="flex-1 px-5 bg-[#171524] ">
+        <View>
+          <View className="border-b border-white pb-2">
+            <Text className="text-2xl font-medium text-white">
+              {forum.title}
+            </Text>
+          </View>
+          <View className="flex flex-row border-[0.5px] border-white rounded-md mt-3 ">
+            <View className="border-r border-white flex items-center w-20 p-2 gap-2">
               <Image
-                className="w-12 h-12 rounded-full border-2 border-[#D8ABF4]"
+                className="w-14 h-14 rounded-full border-2 border-[#D8ABF4]"
                 source={{ uri: forum?.profiles?.avatar_url }}
               />
-              <View className="flex-1 p-4">
-                <Text className="text-xs text-white">
-                  {formatDate(forum.created_at)}
-                </Text>
-                <Text className="text-white">{forum?.description}</Text>
-              </View>
+              <Text className="text-white">{forum?.profiles?.username}</Text>
             </View>
 
-            <Text className="font-medium mt-4 text-white">Comentários</Text>
-            {comments.length === 0 && (
-              <Text className="text-white">Nenhum comentário disponível</Text>
-            )}
+            <View className="flex-1 p-3 bg-[#2a273b] rounded-r-md">
+              <Text className="text-xs text-white">
+                {formatDate(forum.created_at)}
+              </Text>
+              <Text className="text-white">{forum?.description}</Text>
+            </View>
+          </View>
+
+          <Text className="font-medium mt-4 text-white mb-4">Comentários</Text>
+
+          {comments.length === 0 && (
+            <Text className="text-white mb-4">
+              Nenhum comentário disponível
+            </Text>
+          )}
+
+          <View className="flex flex-col gap-3">
             {comments.map((item) => (
-              <View key={item.id} className="border-b border-white/20 pb-3">
-                <View className="flex-row p-4">
-                  {/* <Avatar
-                    src={item?.profiles?.avatar_url}
-                    className="h-14 w-14"
-                  /> */}
+              <View
+                key={item.id}
+                className="border-[0.5px] border-white/20 p-2 rounded-md "
+              >
+                <View className="flex flex-row">
+                  <View className="flex flex-col gap-2 items-center">
+                    <Image
+                      className="w-11 h-11 rounded-full border-2 border-[#D8ABF4]"
+                      source={{ uri: item?.profiles?.avatar_url }}
+                    />
+                    <Text className="text-white text-sm">
+                      {item?.profiles?.username}
+                    </Text>
+                  </View>
+
                   <View className="flex-1 ml-4 ">
                     <Text className="text-xs text-white">
                       {formatDate(item?.created_at)}
@@ -134,23 +146,8 @@ const ForumInfo = () => {
                 </View>
               </View>
             ))}
-
-            {/* <View className="flex-row w-full gap-2 mt-4">
-              <TextInput
-                placeholder="Escreva um comentário..."
-                className="flex-1 border rounded p-2"
-                multiline
-                numberOfLines={3}
-                value={commentBody}
-                onChangeText={setCommentBody}
-              />
-              <CustomButton
-                title={"mensagi"}
-                //   onPress={handleNewComment}
-              />
-            </View> */}
           </View>
-        )}
+        </View>
       </ScrollView>
     </View>
   );

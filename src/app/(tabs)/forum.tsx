@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   View,
   ScrollView,
@@ -8,9 +8,11 @@ import {
   Pressable,
 } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 
 const Forum = () => {
+  const navigation = useNavigation();
+
   const [foruns, setForuns] = useState([]);
   const router = useRouter();
 
@@ -41,8 +43,11 @@ const Forum = () => {
         </View>
         <View className="flex flex-col gap-6 pb-6 px-5">
           {foruns.map((item) => (
-            <Pressable onPress={() => router.push(`../forum/${item.id}`)}>
-              <View className="border-b border-white/20 pb-3" key={item.id}>
+            <Pressable
+              onPress={() => router.push(`../forum/${item.id}`)}
+              key={item.id}
+            >
+              <View className="border-b border-white/20 pb-3">
                 <View className="flex flex-row justify-between">
                   <View className="flex flex-row gap-3 items-center w-[60%]">
                     <Feather name="message-square" size={24} color={"white"} />

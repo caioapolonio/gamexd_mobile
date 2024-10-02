@@ -2,11 +2,11 @@ import React from "react";
 import { View, ScrollView, SafeAreaView, Text } from "react-native";
 import { useEffect, useState } from "react";
 import GameCard from "../components/GameCard";
-import { useRouter } from 'expo-router'; // Importar o hook de navegação
+import { useRouter } from "expo-router"; // Importar o hook de navegação
 
 const Home = () => {
   const [recentGames, setRecentGames] = useState([]);
-  const router = useRouter(); // Inicializar o router
+  const router = useRouter();
 
   const fetchRecentGames = async () => {
     try {
@@ -76,4 +76,3 @@ const Home = () => {
 };
 
 export default Home;
-
