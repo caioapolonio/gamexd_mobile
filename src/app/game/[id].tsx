@@ -1,22 +1,22 @@
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import {
-  useRouter,
-  useLocalSearchParams,
-  router,
-  useNavigation,
-} from "expo-router";
+import { useRouter, useLocalSearchParams, useNavigation } from "expo-router";
 import {
   View,
   Text,
   Image,
   ScrollView,
   ActivityIndicator,
-  VirtualizedList,
+  Modal,
+  TextInput,
+  Button,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import CustomButton from "../components/CustomButton";
+import { useAuth } from "@/src/hooks/AuthContext";
 
 const GameDetails = () => {
   const navigation = useNavigation();
+  const { session } = useAuth();
   const { id } = useLocalSearchParams();
   const [gameDetails, setGameDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,6 +24,12 @@ const GameDetails = () => {
   const [totalRating, setTotalRating] = useState(0);
   const [averageRating, setAverageRating] = useState(null);
   const [platforms, setPlatforms] = useState([]);
+  const [alreadyReviewed, setAlreadyReviewed] = useState(false);
+
+  // State for modal visibility and input values
+  const [modalVisible, setModalVisible] = useState(false);
+  const [starRating, setStarRating] = useState("");
+  const [reviewText, setReviewText] = useState("");
 
   const fetchGameDetails = async () => {
     try {
@@ -67,6 +73,34 @@ const GameDetails = () => {
     }
   }
 
+  const handleReview = async () => {
+    try {
+      const response = await fetch("http://10.0.2.2:3000/reviews/send-review", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id,
+          user_id: session.user.id,
+          review_body: reviewText,
+          star_rating: starRating,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Falha ao avaliar");
+      }
+
+      fetchReviews();
+      setReviewText("");
+      setModalVisible(false);
+      setAlreadyReviewed(true);
+    } catch (error) {
+      console.error("Error updating game:", error);
+    }
+  };
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: gameDetails?.name ? gameDetails.name : "Loading...",
@@ -103,8 +137,8 @@ const GameDetails = () => {
             />
           </View>
 
-          <View className="flex flex-col bg-[#373545] w-[35%] rounded-lg gap-5 pt-4">
-            <View className="flex flex-row gap-5 justify-center mt-4">
+          <View className="flex flex-col bg-[#373545] w-[35%] rounded-lg gap-1 pt-3 ">
+            <View className="flex flex-row gap-5 justify-center">
               <View className="flex flex-row gap-1 items-center justify-center">
                 <FontAwesome name="star" size={18} color="green" />
                 <Text className="text-white">{totalRating}</Text>
@@ -122,15 +156,28 @@ const GameDetails = () => {
             <View className="p-2">
               <Text className="text-white">Plataformas</Text>
               <View className="h-0.5 w-full bg-white"></View>
-
               <View className="pt-2 gap-2">
                 {platforms?.map((item) => (
-                  <View className="rounded-full text-sm border border-neutral-50 text-neutral-50 inline-flex items-center">
-                    <Text className="text-white" key={item}>
-                      {item}
-                    </Text>
+                  <View
+                    className="rounded-full text-sm border border-neutral-50 text-neutral-50 inline-flex items-center"
+                    key={item}
+                  >
+                    <Text className="text-white">{item}</Text>
                   </View>
                 ))}
+              </View>
+            </View>
+            <View className="flex flex-row justify-between px-6 mt-3">
+              <View className="flex flex-row gap-1 items-center justify-center">
+                <FontAwesome
+                  name="star"
+                  size={34}
+                  color="green"
+                  onPress={() => setModalVisible(true)} // Open the modal on press
+                />
+              </View>
+              <View className="flex flex-row gap-1 items-center justify-center">
+                <FontAwesome name="heart" size={32} color="pink" />
               </View>
             </View>
           </View>
@@ -172,6 +219,45 @@ const GameDetails = () => {
           </ScrollView>
         </View>
       </View>
+
+      <Modal visible={modalVisible} animationType="slide" transparent={true}>
+        <View className="flex-1 justify-center items-center bg-black/50 ">
+          <View className="bg-zinc-800 rounded-lg p-6 w-80">
+            <View className="flex flex-row justify-end">
+              <FontAwesome
+                name="close"
+                size={24}
+                color="white"
+                onPress={() => setModalVisible(false)}
+              />
+            </View>
+            <Text className="text-lg mb-4 text-white">Avaliar</Text>
+            <TextInput
+              placeholder="Rating (1-5)"
+              placeholderClassName="text-zinc-500"
+              value={starRating}
+              onChangeText={setStarRating}
+              keyboardType="numeric"
+              className="border border-gray-300 mb-4 p-2 rounded-md"
+            />
+            <TextInput
+              placeholder="Your Review"
+              placeholderClassName="text-zinc-500"
+              value={reviewText}
+              onChangeText={setReviewText}
+              multiline
+              numberOfLines={4}
+              className="border border-gray-300 mb-4 p-2 text-white rounded-md"
+            />
+            <CustomButton
+              title="Submit"
+              containerStyles="w-full bg-[#AB72CE] rounded-2xl"
+              textStyles={"text-white text-lg"}
+              handlePress={handleReview}
+            />
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
