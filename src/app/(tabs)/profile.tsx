@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/AuthContext";
 import { supabase } from "../../db/supabase";
 import GameCard from "../components/GameCard";
-import StarRating from "../components/StarRating";
 import CustomButton from "../components/CustomButton";
 import { useRouter } from "expo-router";
+import Feather from "@expo/vector-icons/Feather";
 
 const Profile = () => {
   const { session, signOut } = useAuth();
@@ -23,8 +23,6 @@ const Profile = () => {
       .select("*")
       .eq("id", session.user.id)
       .single();
-    console.log("DATA", data);
-    console.log("SESSION", session);
     setUser(data);
     setLoading(false);
   };
@@ -32,14 +30,10 @@ const Profile = () => {
   const handleFavorites = async () => {
     try {
       const response = await fetch(
-      `http://10.0.2.2:3000/favorites/${session.user.id}`
+        `http://10.0.2.2:3000/favorites/${session.user.id}`
       );
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
       const result = await response.json();
       setUserFavorites(result);
-      console.log("User favorites", result);
     } catch (error) {
       console.error("Erro ao obter dados:", error);
     }
@@ -50,12 +44,8 @@ const Profile = () => {
       const response = await fetch(
         `http://10.0.2.2:3000/reviews/user-reviews/${session.user.id}`
       );
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
       const result = await response.json();
       setUserReviews(result);
-      console.log("user review", result);
     } catch (error) {
       console.error("Erro ao recuperar dados:", error);
     }
@@ -68,8 +58,12 @@ const Profile = () => {
   }, []);
 
   return (
-    <SafeAreaView className="h-full w-full">
-      <ScrollView className="bg-[#171524] h-full pt-16">
+    <SafeAreaView className="h-full">
+      <ScrollView 
+        className="bg-[#171524] h-full pt-16"
+        contentContainerStyle={{ paddingBottom: 100 }} // Adiciona padding na parte inferior
+      >
+        {/* Header do Usuário */}
         <View className="pb-6 px-5 flex flex-row gap-6 w-full justify-between">
           <View className="flex flex-row gap-6">
             <Image
@@ -86,19 +80,18 @@ const Profile = () => {
               </Text>
             </View>
           </View>
-
-          <View>
-            <CustomButton
-              title={"Sair"}
-              containerStyles="rounded-2xl text-white border border-white w-20 h-12"
-              textStyles={"text-white"}
-              handlePress={signOut}
-            ></CustomButton>
-          </View>
+          <CustomButton
+            containerStyles="rounded-2xl text-white border border-white w-20 h-12 flex items-center justify-center"
+            handlePress={signOut}
+          >
+            <Feather name="log-out" size={24} color="white" />
+          </CustomButton>
         </View>
+
+        {/* Jogos Favoritos */}
         <View className="pb-6 px-5">
           <Text className="text-white text-lg pb-1">Jogos Favoritos</Text>
-          <View className="h-0.5 w-full bg-white"></View>
+          <View className="h-0.5 w-full bg-white" />
         </View>
         <ScrollView
           horizontal
@@ -111,46 +104,38 @@ const Profile = () => {
                 key={item.game_id}
                 title={item.Games.name}
                 src={item.Games.header_image}
-                card={false}
-            onPress={() => router.push(`../game/${item.game_id}`)}
+                onPress={() => router.push(`../game/${item.game_id}`)}
               />
             ))}
           </View>
         </ScrollView>
+
+        {/* Últimas Avaliações */}
         <View className="pb-6 px-5">
-          <Text className="text-white text-lg">Análises</Text>
-          <View className="h-0.5 w-full bg-white"></View>
+          <Text className="text-white text-lg pb-1">Últimas avaliações</Text>
+          <View className="h-0.5 w-full bg-white" />
         </View>
-        <ScrollView className="h-64 w-full">
-          <View className="flex flex-col px-4 gap-10">
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View className="flex flex-row gap-4 px-4">
             {userReviews.map((item) => (
-              <View key={item.id} className="flex flex-row justify-between">
-                <View className="flex flex-row gap-6">
-                  <Image
-                    className="w-12 h-12 rounded-full border-2 border-[#D8ABF4]"
-                    source={{ uri: user.avatar_url }}
-                  />
-                  <View>
-                    <Text className="text-white text-lg">{user.username}</Text>
-                    <Text
-                      className="text-white text-base w-36"
-                      numberOfLines={5}
-                    >
-                      {item.review_body}
-                    </Text>
-                  </View>
-                </View>
-                <GameCard
-                  key={item.game_id}
-                  title={item.Games.name}
-                  src={item.Games.header_image}
-                  card={true}
-                  onPress={() => router.push(`../game/${item.game_id}`)}
-                />
-              </View>
+              <GameCard
+                key={item.game_id}
+                title={item.Games.name}
+                src={item.Games.header_image}
+                onPress={() => router.push(`../game/${item.game_id}`)}
+              />
             ))}
           </View>
         </ScrollView>
+
+        {/* Outros */}
+        <View className="pb-6 px-5 mt-6">
+          <Text className="text-white text-lg pb-1">Outros</Text>
+          <View className="h-0.5 w-full bg-white mb-4" />
+          <Text className="text-white text-lg">Todos os jogos</Text>
+          <Text className="text-white text-lg">Listas</Text>
+          <Text className="text-white text-lg">Fóruns</Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

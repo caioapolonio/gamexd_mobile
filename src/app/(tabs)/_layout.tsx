@@ -9,14 +9,11 @@ const TabsLayout = () => {
         tabBarShowLabel: false,
         headerShown: false,
         tabBarStyle: {
-          borderTopEndRadius: 12,
-          borderTopStartRadius: 12,
+          borderTopEndRadius: 14,
+          borderTopStartRadius: 14,
           backgroundColor: "#373545",
           height: 60,
           position: "absolute",
-          bottom: 16,
-          right: 16,
-          left: 16,
         },
       }}
     >

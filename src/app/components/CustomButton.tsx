@@ -7,6 +7,7 @@ const CustomButton = ({
   isLoading,
   containerStyles,
   textStyles,
+  children,
 }) => {
   return (
     <Pressable
@@ -16,9 +17,13 @@ const CustomButton = ({
         isLoading ? "opacity-50" : ""
       }`}
     >
-      <Text className={`text-black font-semibold text-lg ${textStyles}`}>
-        {title}
-      </Text>
+      {children ? (
+        children
+      ) : (
+        <Text className={`text-black font-semibold text-lg ${textStyles}`}>
+          {title}
+        </Text>
+      )}
     </Pressable>
   );
 };
