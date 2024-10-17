@@ -9,21 +9,24 @@ import {
   Modal,
   TextInput,
   Pressable,
+  StyleSheet,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import CustomButton from "../components/CustomButton";
 import { useAuth } from "@/src/hooks/AuthContext";
 import StarRating from "react-native-star-rating-widget";
+import { StarRatingDisplay } from "react-native-star-rating-widget";
+import { set } from "react-hook-form";
 
 const GameDetails = () => {
   const navigation = useNavigation();
   const { session } = useAuth();
   const { id } = useLocalSearchParams();
   const [gameDetails, setGameDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [totalRating, setTotalRating] = useState(0);
-  const [averageRating, setAverageRating] = useState(null);
+  const [averageRating, setAverageRating] = useState(0);
   const [platforms, setPlatforms] = useState([]);
   const [alreadyReviewed, setAlreadyReviewed] = useState(false);
   const [favorite, setFavorite] = useState(false);
@@ -35,6 +38,7 @@ const GameDetails = () => {
 
   const fetchGameDetails = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`http://10.0.2.2:3000/games/${id}`);
       const result = await response.json();
       setGameDetails(result);
@@ -46,6 +50,7 @@ const GameDetails = () => {
       setLoading(false);
     } catch (error) {
       console.error("Erro ao carregar os detalhes do jogo:", error);
+      setLoading(false);
     }
   };
 
@@ -66,8 +71,6 @@ const GameDetails = () => {
         );
         setTotalRating(totalRatingResult);
         setAverageRating(totalRatingResult / result.length);
-      } else {
-        setAverageRating("Sem avaliações");
       }
       console.log("Average Rating:", averageRating);
     } catch (error) {
@@ -77,6 +80,7 @@ const GameDetails = () => {
 
   const handleReview = async () => {
     try {
+      setLoading(true);
       const response = await fetch("http://10.0.2.2:3000/reviews/send-review", {
         method: "POST",
         headers: {
@@ -95,11 +99,12 @@ const GameDetails = () => {
       }
 
       fetchReviews();
-      setReviewText("");
       setModalVisible(false);
       setAlreadyReviewed(true);
+      setLoading(false);
     } catch (error) {
       console.error("Error updating game:", error);
+      setLoading(false);
     }
   };
 
@@ -181,6 +186,7 @@ const GameDetails = () => {
         throw new Error("Network response was not ok");
       }
       const result = await response.json();
+      console.log("result", result);
       console.log("User review", result[0]);
 
       if (result.length > 0) {
@@ -191,7 +197,7 @@ const GameDetails = () => {
 
         return true;
       }
-      console.log("User already reviewed ?", alreadyReviewed);
+      console.log("User already reviewed?", alreadyReviewed);
     } catch (error) {
       console.error("Erro ao recuperar dados:", error);
     }
@@ -199,6 +205,8 @@ const GameDetails = () => {
 
   const updateReview = async () => {
     try {
+      userAlreadyReviewed();
+      setLoading(true);
       const response = await fetch(
         "http://10.0.2.2:3000/reviews/update-review",
         {
@@ -220,13 +228,14 @@ const GameDetails = () => {
       }
       setModalVisible(false);
       setAlreadyReviewed(true);
-
       fetchReviews();
-      userAlreadyReviewed();
-      setReviewText(userReview.review_body);
+
+      //setReviewText(userReview.review_body);
+      setLoading(false);
       console.log("Usuario editou a avaliação");
     } catch (error) {
       console.error("Error updating game:", error);
+      setLoading(false);
     }
     console.log("userReview.review_body", userReview.review_body);
   };
@@ -276,8 +285,19 @@ const GameDetails = () => {
               </View>
               <View className="p-2">
                 <Text className="text-white">Média</Text>
-                <View className="h-0.5 w-full bg-white"></View>
-                <Text className="text-white">{averageRating}</Text>
+                <View className="h-0.5 w-full bg-white mb-2"></View>
+                {averageRating === 0 ? (
+                  <Text className="text-white">Sem avaliações</Text>
+                ) : (
+                  <StarRatingDisplay
+                    rating={averageRating}
+                    color="#64C25C"
+                    emptyColor="#565175"
+                    starSize={23}
+                    style={styles.starRating}
+                    starStyle={styles.star}
+                  />
+                )}
               </View>
               <View className="p-2">
                 <Text className="text-white">Plataformas</Text>
@@ -308,12 +328,12 @@ const GameDetails = () => {
                 onPress={favorite ? handleUnfavorite : handleFavorite}
               >
                 {favorite ? (
-                  <View className="flex flex-row relative px-3 pt-3 pb-2  items-center justify-center bg-black/30 rounded-full">
+                  <View className="flex flex-row relative px-3 pt-3 pb-2  items-center justify-center bg-black/40 rounded-full">
                     <FontAwesome name="heart" size={32} color="pink" />
                   </View>
                 ) : (
-                  <View className="flex flex-row relative px-3 pt-3 pb-2  items-center justify-center bg-black/30 rounded-full">
-                    <FontAwesome name="heart-o" size={32} color="white" />
+                  <View className="flex flex-row relative px-3 pt-3 pb-2  items-center justify-center bg-black/40 rounded-full">
+                    <FontAwesome name="heart-o" size={32} color="pink" />
                   </View>
                 )}
               </Pressable>
@@ -323,35 +343,54 @@ const GameDetails = () => {
           <Text className="text-white px-4">
             {gameDetails?.short_description}
           </Text>
-          <Text className="text-white px-4">
+          <Text className="text-white px-4 text-lg font-bold">
             {gameDetails?.publishers} • {gameDetails?.release_date}
           </Text>
           <View className="flex flex-col p-4 mb-8">
             <Text className="text-white text-lg">Avaliações</Text>
             <View className="h-0.5 w-full bg-white"></View>
-            <ScrollView className=" w-full pt-4">
-              <View className="flex flex-col px-4 gap-10">
-                {reviews.map((item) => (
-                  <View key={item.id} className="flex flex-row justify-between">
-                    <View className="flex flex-row gap-6">
-                      <Image
-                        className="w-12 h-12 rounded-full border-2 border-[#D8ABF4]"
-                        source={{ uri: item.profiles.avatar_url }}
-                      />
-                      <View>
-                        <Text className="text-white text-lg">
-                          {item.profiles.username}
-                        </Text>
-                        <Text
-                          className="text-white text-base w-56"
-                          numberOfLines={5}
-                        >
-                          {item.review_body}
-                        </Text>
+            <ScrollView className="w-full pt-4">
+              <View className="flex flex-col gap-10">
+                {reviews.length === 0 ? (
+                  <Text className="text-white text-base">
+                    Nenhuma análise disponível
+                  </Text>
+                ) : (
+                  reviews.map((item) => (
+                    <View
+                      key={item.id}
+                      className="flex flex-row justify-between"
+                    >
+                      <View className="flex flex-row gap-6">
+                        <Image
+                          className="w-12 h-12 rounded-full border-2 border-[#D8ABF4]"
+                          source={{ uri: item.profiles.avatar_url }}
+                        />
+                        <View>
+                          <Text className="text-white text-lg">
+                            {item.profiles.username}
+                          </Text>
+                          <View className="flex flex-row items-center">
+                            <StarRatingDisplay
+                              rating={item.star_rating}
+                              color="#64C25C"
+                              emptyColor="#2c2847"
+                              starSize={25}
+                              style={styles.starRating}
+                              starStyle={styles.star}
+                            />
+                          </View>
+                          <Text
+                            className="text-white text-base w-56 mt-2 pl-1"
+                            numberOfLines={5}
+                          >
+                            {item.review_body}
+                          </Text>
+                        </View>
                       </View>
                     </View>
-                  </View>
-                ))}
+                  ))
+                )}
               </View>
             </ScrollView>
           </View>
@@ -398,14 +437,25 @@ const GameDetails = () => {
                 onChangeText={setReviewText}
                 multiline
                 numberOfLines={4}
+                maxLength={120}
                 textAlignVertical="top"
-                className="border border-gray-700 mb-4 p-2 text-white rounded-md bg-black/20"
+                className="border border-gray-700 mb-1 p-2 text-white rounded-md bg-black/20"
               />
+              <Text className="self-end text-white text-sm mb-4">
+                {reviewText.length}/120
+              </Text>
               <CustomButton
-                title={alreadyReviewed ? "Reavaliar" : "Avaliar"}
+                title={
+                  loading
+                    ? "Carregando..."
+                    : alreadyReviewed
+                    ? "Reavaliar"
+                    : "Avaliar"
+                }
                 containerStyles="w-full bg-[#AB72CE] rounded-2xl"
                 textStyles={"text-white text-lg"}
                 handlePress={alreadyReviewed ? updateReview : handleReview}
+                isLoading={loading}
               />
             </View>
           </View>
@@ -431,4 +481,10 @@ const GameDetails = () => {
   );
 };
 
+const styles = StyleSheet.create({
+  starRating: {},
+  star: {
+    marginHorizontal: 0,
+  },
+});
 export default GameDetails;
