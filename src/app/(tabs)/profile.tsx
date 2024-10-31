@@ -1,5 +1,12 @@
 import React from "react";
-import { View, ScrollView, SafeAreaView, Text, Image } from "react-native";
+import {
+  View,
+  ScrollView,
+  SafeAreaView,
+  Text,
+  Image,
+  StyleSheet,
+} from "react-native";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/AuthContext";
 import { supabase } from "../../db/supabase";
@@ -7,6 +14,7 @@ import GameCard from "../components/GameCard";
 import CustomButton from "../components/CustomButton";
 import { useRouter } from "expo-router";
 import Feather from "@expo/vector-icons/Feather";
+import { StarRatingDisplay } from "react-native-star-rating-widget";
 
 const Profile = () => {
   const { session, signOut } = useAuth();
@@ -55,15 +63,14 @@ const Profile = () => {
     handleUser();
     handleFavorites();
     handleUserReviews();
-  }, []);
+  }, [userFavorites]);
 
   return (
     <SafeAreaView className="h-full">
-      <ScrollView 
+      <ScrollView
         className="bg-[#171524] h-full pt-16"
-        contentContainerStyle={{ paddingBottom: 100 }} // Adiciona padding na parte inferior
+        contentContainerStyle={{ paddingBottom: 100 }}
       >
-        {/* Header do Usuário */}
         <View className="pb-6 px-5 flex flex-row gap-6 w-full justify-between">
           <View className="flex flex-row gap-6">
             <Image
@@ -109,36 +116,59 @@ const Profile = () => {
             ))}
           </View>
         </ScrollView>
-
-        {/* Últimas Avaliações */}
         <View className="pb-6 px-5">
           <Text className="text-white text-lg pb-1">Últimas avaliações</Text>
           <View className="h-0.5 w-full bg-white" />
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View className="flex flex-row gap-4 px-4">
+        <ScrollView className="mb-8">
+          <View className="flex flex-col px-4 gap-10">
             {userReviews.map((item) => (
-              <GameCard
-                key={item.game_id}
-                title={item.Games.name}
-                src={item.Games.header_image}
-                onPress={() => router.push(`../game/${item.game_id}`)}
-              />
+              <View key={item.id} className="flex flex-row justify-between ">
+                <View className="flex flex-row gap-6">
+                  <Image
+                    className="w-12 h-12 rounded-full border-2 border-[#D8ABF4]"
+                    source={{ uri: user.avatar_url }}
+                  />
+                  <View className="">
+                    <Text className="text-white text-lg">{user.username}</Text>
+                    <View className="flex flex-row items-center ">
+                      <StarRatingDisplay
+                        rating={item.star_rating}
+                        color="#64C25C"
+                        emptyColor="#2c2847"
+                        starSize={20}
+                        style={styles.starRating}
+                        starStyle={styles.star}
+                      />
+                    </View>
+                    <View className="w-28">
+                      <Text className="text-white text-base">
+                        {item.review_body}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                <GameCard
+                  key={item.game_id}
+                  title={item.Games.name}
+                  src={item.Games.header_image}
+                  card={true}
+                  onPress={() => router.push(`../game/${item.game_id}`)}
+                />
+              </View>
             ))}
           </View>
         </ScrollView>
-
-        {/* Outros */}
-        <View className="pb-6 px-5 mt-6">
-          <Text className="text-white text-lg pb-1">Outros</Text>
-          <View className="h-0.5 w-full bg-white mb-4" />
-          <Text className="text-white text-lg">Todos os jogos</Text>
-          <Text className="text-white text-lg">Listas</Text>
-          <Text className="text-white text-lg">Fóruns</Text>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  starRating: {},
+  star: {
+    marginHorizontal: 0,
+  },
+});
 
 export default Profile;
