@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   View,
   ScrollView,
@@ -12,7 +12,7 @@ import { useAuth } from "../../hooks/AuthContext";
 import { supabase } from "../../db/supabase";
 import GameCard from "../components/GameCard";
 import CustomButton from "../components/CustomButton";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import Feather from "@expo/vector-icons/Feather";
 import { StarRatingDisplay } from "react-native-star-rating-widget";
 
@@ -25,24 +25,29 @@ const Profile = () => {
   const router = useRouter();
 
   const handleUser = async () => {
-    setLoading(true);
     const { data } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", session.user.id)
       .single();
+    console.log("setou user");
     setUser(data);
-    setLoading(false);
   };
 
   const handleFavorites = async () => {
+    setLoading(true);
+
     try {
       const response = await fetch(
         `http://10.0.2.2:3000/favorites/${session.user.id}`
       );
       const result = await response.json();
       setUserFavorites(result);
+      setLoading(false);
+      console.log("setou favoritos");
     } catch (error) {
+      setLoading(false);
+
       console.error("Erro ao obter dados:", error);
     }
   };
@@ -54,16 +59,26 @@ const Profile = () => {
       );
       const result = await response.json();
       setUserReviews(result);
+      console.log("setou reviews");
     } catch (error) {
       console.error("Erro ao recuperar dados:", error);
     }
   };
 
-  useEffect(() => {
-    handleUser();
-    handleFavorites();
-    handleUserReviews();
-  }, [userFavorites]);
+  useFocusEffect(
+    useCallback(() => {
+      // Atualizar os dados quando a tela for focada
+      const fetchData = async () => {
+        await Promise.all([
+          handleUser(),
+          handleFavorites(),
+          handleUserReviews(),
+        ]);
+      };
+      fetchData();
+      return () => {};
+    }, [])
+  );
 
   return (
     <SafeAreaView className="h-full">
@@ -88,24 +103,28 @@ const Profile = () => {
             </View>
           </View>
           <CustomButton
-            containerStyles="rounded-2xl text-white border border-white w-20 h-12 flex items-center justify-center"
+            containerStyles="rounded-2xl text-white border-2 border-white w-20 h-12 flex items-center justify-center"
             handlePress={signOut}
           >
             <Feather name="log-out" size={24} color="white" />
           </CustomButton>
         </View>
 
-        {/* Jogos Favoritos */}
-        <View className="pb-6 px-5">
+        <View className="pb-2 px-5">
           <Text className="text-white text-lg pb-1">Jogos Favoritos</Text>
           <View className="h-0.5 w-full bg-white" />
         </View>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          className="mb-4 h-64"
+          className="mb-4"
         >
           <View className="flex flex-row gap-4 px-4">
+            {userFavorites.length === 0 && (
+              <Text className="text-zinc-300 text-lg px-1">
+                Você ainda não tem jogos favoritos
+              </Text>
+            )}
             {userFavorites.map((item) => (
               <GameCard
                 key={item.game_id}
