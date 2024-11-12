@@ -35,6 +35,7 @@ const GameDetails = () => {
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState("");
   const [userReview, setUserReview] = useState({});
+  const [loadingHandleReview, setLoadingHandleReview] = useState(false);
 
   const fetchGameDetails = async () => {
     try {
@@ -80,7 +81,7 @@ const GameDetails = () => {
 
   const handleReview = async () => {
     try {
-      setLoading(true);
+      setLoadingHandleReview(true);
       const response = await fetch("http://10.0.2.2:3000/reviews/send-review", {
         method: "POST",
         headers: {
@@ -101,10 +102,10 @@ const GameDetails = () => {
       fetchReviews();
       setModalVisible(false);
       setAlreadyReviewed(true);
-      setLoading(false);
+      setLoadingHandleReview(false);
     } catch (error) {
       console.error("Error updating game:", error);
-      setLoading(false);
+      setLoadingHandleReview(false);
     }
   };
 
@@ -206,7 +207,7 @@ const GameDetails = () => {
   const updateReview = async () => {
     try {
       userAlreadyReviewed();
-      setLoading(true);
+      setLoadingHandleReview(true);
       const response = await fetch(
         "http://10.0.2.2:3000/reviews/update-review",
         {
@@ -225,17 +226,19 @@ const GameDetails = () => {
 
       if (!response.ok) {
         throw new Error("Falha ao avaliar");
+        setLoadingHandleReview(false);
       }
       setModalVisible(false);
       setAlreadyReviewed(true);
       fetchReviews();
+      setLoadingHandleReview(false);
 
       //setReviewText(userReview.review_body);
-      setLoading(false);
+
       console.log("Usuario editou a avaliação");
     } catch (error) {
       console.error("Error updating game:", error);
-      setLoading(false);
+      setLoadingHandleReview(false);
     }
     console.log("userReview.review_body", userReview.review_body);
   };
@@ -445,17 +448,11 @@ const GameDetails = () => {
                 {reviewText.length}/120
               </Text>
               <CustomButton
-                title={
-                  loading
-                    ? "Carregando..."
-                    : alreadyReviewed
-                    ? "Reavaliar"
-                    : "Avaliar"
-                }
+                title={loadingHandleReview ? "Carregando..." : "Enviar"}
                 containerStyles="w-full bg-[#AB72CE] rounded-2xl"
                 textStyles={"text-white text-lg"}
                 handlePress={alreadyReviewed ? updateReview : handleReview}
-                isLoading={loading}
+                isLoading={loadingHandleReview}
               />
             </View>
           </View>
