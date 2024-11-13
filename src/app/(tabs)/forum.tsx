@@ -1,4 +1,9 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "react";
 import {
   View,
   ScrollView,
@@ -8,9 +13,10 @@ import {
   Pressable,
   Modal,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-import { useNavigation, useRouter } from "expo-router";
+import { useFocusEffect, useNavigation, useRouter } from "expo-router";
 import { useAuth } from "@/src/hooks/AuthContext";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { set } from "react-hook-form";
@@ -27,6 +33,7 @@ const Forum = () => {
   const [forumTitle, setforumTitle] = useState("");
   const [forumDescription, setforumDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingNewForum, setLoadingNewForum] = useState(false);
 
   function formatDate(dateString: string) {
     const date = new Date(dateString);
@@ -54,7 +61,7 @@ const Forum = () => {
 
   const handleNewForum = async () => {
     try {
-      setLoading(true);
+      setLoadingNewForum(true);
       const response = await fetch("http://10.0.2.2:3000/forums/new-forum", {
         method: "POST",
         headers: {
@@ -74,17 +81,24 @@ const Forum = () => {
       setforumTitle("");
       setforumDescription("");
       setOpenForum(false);
-      setLoading(false);
+      setLoadingNewForum(false);
       handleForum();
     } catch (error) {
-      setLoading(false);
+      setLoadingNewForum(false);
       console.error("Erro ao recuperar dados:", error);
     }
   };
 
-  useEffect(() => {
-    handleForum();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      // Atualizar os dados quando a tela for focada
+      const fetchData = async () => {
+        await Promise.all([handleForum()]);
+      };
+      fetchData();
+      return () => {};
+    }, [])
+  );
 
   return (
     <View className="h-full bg-[#171524]">
@@ -179,11 +193,11 @@ const Forum = () => {
                 {forumDescription.length}/240
               </Text>
               <CustomButton
-                title={loading ? "Carregando..." : "Criar Tópico"}
+                title={loadingNewForum ? "Carregando..." : "Criar Tópico"}
                 containerStyles="w-full bg-[#AB72CE] rounded-2xl"
                 textStyles={"text-white text-lg"}
                 handlePress={handleNewForum}
-                isLoading={loading}
+                isLoading={loadingNewForum}
               />
             </View>
           </View>
