@@ -10,19 +10,22 @@ const { width } = Dimensions.get("window");
 
 const funcionalidades = [
   {
-    titulo: "Avaliação de Jogos",
-    descricao:
-      "Dê sua opinião sobre jogos e confira as avaliações dos outros jogadores.",
+    // titulo: "Avaliação de Jogos",
+    // descricao:
+    //   "Dê sua opinião sobre jogos e confira as avaliações dos outros jogadores.",
+    imagem: require	("../../assets/images/cards/card-gam.jpg"),
   },
   {
-    titulo: "Fórum de Discussões",
-    descricao:
-      "Participe de discussões sobre os seus jogos favoritos e compartilhe suas ideias.",
+    // titulo: "Adicione aos Favoritos",
+    // descricao:
+    //   "Salve seus jogos favoritos para acessá-los rapidamente a qualquer momento.",
+    imagem: require	("../../assets/images/cards/card-fav.jpg"),
   },
   {
-    titulo: "Adicione aos Favoritos",
-    descricao:
-      "Salve seus jogos favoritos para acessá-los rapidamente a qualquer momento.",
+    // titulo: "Fórum de Discussões",
+    // descricao:
+    //   "Participe de discussões sobre os seus jogos favoritos e compartilhe suas ideias.",
+    imagem: require  ("../../assets/images/cards/card-for.jpg"),
   },
 ];
 
@@ -61,12 +64,13 @@ const Index = () => {
                   height: 450,
                 }}
               >
-                <Text className="text-lg font-bold text-white text-center">
+                <Image source={item.imagem} style={{ width: "100%", height: "100%", borderRadius: 16,}} resizeMode="cover" />
+                {/* <Text className="text-lg font-bold text-white text-center">
                   {item.titulo}
                 </Text>
                 <Text className="text-sm text-gray-200 text-center">
                   {item.descricao}
-                </Text>
+                </Text> */}
               </LinearGradient>
             )}
           />
